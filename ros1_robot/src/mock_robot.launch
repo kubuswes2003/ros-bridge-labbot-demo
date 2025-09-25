@@ -1,0 +1,12 @@
+<!-- Mock Robot Launch File dla ROS1 -->
+<launch>
+    <!-- Uruchom nasz mock robot node (roscore już działa w kontenerze) -->
+    <node name="mock_labbot" pkg="labbot_mock" type="mock_robot.py" output="screen">
+        <remap from="/cmd_vel" to="/cmd_vel" />
+        <remap from="/odom" to="/odom" />
+    </node>
+    
+    <!-- Dodatkowe info dla debugowania -->
+    <param name="robot_description" value="Mock Labbot Robot for ROS Bridge Demo" />
+    
+</launch>
