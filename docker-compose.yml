@@ -1,5 +1,4 @@
 services:
-  # ROS1 Mock Robot - symuluje labbot robota
   ros1_robot:
     build: 
       context: ./ros1_robot
@@ -12,15 +11,8 @@ services:
       - ros_network
     volumes:
       - ./ros1_robot/src:/robot_ws:rw
-    command: >
-      bash -c "
-        source /opt/ros/noetic/setup.bash &&
-        roscore &
-        sleep 3 &&
-        python3 /robot_ws/mock_robot.py
-      "
+    command: "bash -c 'source /opt/ros/noetic/setup.bash && roscore & sleep 3 && python3 /robot_ws/mock_robot.py'"
 
-  # ROS1 Bridge - GOTOWY obraz bez dodatkowej instalacji
   ros1_bridge:
     image: ros:foxy-ros1-bridge-focal
     container_name: ros_bridge
@@ -32,18 +24,8 @@ services:
       - ROS_DOMAIN_ID=0
     networks:
       - ros_network
-    command: >
-      bash -c "
-        echo '🌉 Uruchamianie prawdziwego ros1_bridge...' &&
-        echo '📡 Connecting to ROS1 at: $ROS_MASTER_URI' &&
-        source /opt/ros/noetic/setup.bash &&
-        source /opt/ros/foxy/setup.bash &&
-        echo '✅ Sourced ROS1 Noetic + ROS2 Foxy' &&
-        echo '🔄 Starting dynamic bridge with all topics...' &&
-        ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
-      "
+    command: "bash -c 'source /opt/ros/noetic/setup.bash && source /opt/ros/foxy/setup.bash && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics'"
 
-  # ROS2 Controller - Twoja aplikacja sterująca
   ros2_controller:
     build:
       context: ./ros2_controller  
@@ -59,14 +41,18 @@ services:
       - ./ros2_controller/src:/ros2_ws/src/robot_controller:rw
     stdin_open: true
     tty: true
-    command: >
-      bash -c "
-        source /opt/ros/foxy/setup.bash &&
-        source /ros2_ws/install/setup.bash &&
-        python3 /ros2_ws/src/robot_controller/robot_controller/controller_node.py
-      "
+    command: "bash -c 'source /opt/ros/foxy/setup.bash && source /ros2_ws/install/setup.bash && python3 /ros2_ws/src/robot_controller/robot_controller/controller_node.py'"
 
-# Sieć Docker - pozwala kontenerom się komunikować
+  web_dashboard:
+    image: nginx:alpine
+    container_name: ros_dashboard
+    ports:
+      - "8080:80"
+    volumes:
+      - ./visualization:/usr/share/nginx/html:ro
+    networks:
+      - ros_network
+
 networks:
   ros_network:
     driver: bridge
