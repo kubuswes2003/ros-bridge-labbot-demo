@@ -1,0 +1,59 @@
+services:
+  ros1_robot_melodic:
+    build: 
+      context: ./ros1_robot_melodic
+      dockerfile: Dockerfile
+    container_name: labbot_melodic
+    environment:
+      - ROS_MASTER_URI=http://ros_noetic_master:11311
+      - ROS_HOSTNAME=ros1_robot_melodic
+    networks:
+      - ros_network
+    volumes:
+      - ./ros1_robot_melodic/src:/robot_ws:rw
+    command: "bash -c 'source /opt/ros/melodic/setup.bash && python /robot_ws/mock_robot.py'"
+
+  ros_noetic_master:
+    image: osrf/ros:noetic-desktop
+    container_name: ros_noetic_master
+    environment:
+      - ROS_MASTER_URI=http://ros_noetic_master:11311
+      - ROS_HOSTNAME=ros_noetic_master
+    networks:
+      - ros_network
+    command: "bash -c 'source /opt/ros/noetic/setup.bash && roscore'"
+
+  ros1_bridge:
+    image: ros:foxy-ros1-bridge-focal
+    container_name: bridge_noetic_humble
+    depends_on:
+      - ros_noetic_master
+      - ros1_robot_melodic
+    environment:
+      - ROS_MASTER_URI=http://ros_noetic_master:11311
+      - ROS_HOSTNAME=ros1_bridge
+      - ROS_DOMAIN_ID=0
+    networks:
+      - ros_network
+    command: "bash -c 'source /opt/ros/noetic/setup.bash && source /opt/ros/foxy/setup.bash && sleep 5 && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics'"
+
+  ros2_controller_humble:
+    build:
+      context: ./ros2_controller_humble  
+      dockerfile: Dockerfile
+    container_name: robot_controller_humble
+    depends_on:
+      - ros1_bridge
+    environment:
+      - ROS_DOMAIN_ID=0
+    networks:
+      - ros_network
+    volumes:
+      - ./ros2_controller_humble/src:/ros2_ws/src/robot_controller:rw
+    stdin_open: true
+    tty: true
+    command: "bash -c 'source /opt/ros/humble/setup.bash && source /ros2_ws/install/setup.bash && sleep 8 && python3 /ros2_ws/src/robot_controller/robot_controller/controller_node.py'"
+
+networks:
+  ros_network:
+    driver: bridge

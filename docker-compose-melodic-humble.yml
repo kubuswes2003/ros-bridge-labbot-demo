@@ -1,0 +1,48 @@
+services:
+  ros1_robot_melodic:
+    build: 
+      context: ./ros1_robot_melodic
+      dockerfile: Dockerfile
+    container_name: labbot_melodic
+    environment:
+      - ROS_MASTER_URI=http://ros1_robot_melodic:11311
+      - ROS_HOSTNAME=ros1_robot_melodic
+    networks:
+      - ros_network
+    volumes:
+      - ./ros1_robot_melodic/src:/robot_ws:rw
+    command: "bash -c 'source /opt/ros/melodic/setup.bash && roscore & sleep 3 && python /robot_ws/mock_robot.py'"
+
+  ros1_bridge_melodic_humble:
+    image: ros:humble-ros1-bridge
+    container_name: bridge_melodic_humble
+    depends_on:
+      - ros1_robot_melodic
+    environment:
+      - ROS_MASTER_URI=http://ros1_robot_melodic:11311
+      - ROS_HOSTNAME=ros1_bridge_melodic_humble
+      - ROS_DOMAIN_ID=0
+    networks:
+      - ros_network
+    command: "bash -c 'source /opt/ros/noetic/setup.bash && source /opt/ros/humble/setup.bash && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics'"
+
+  ros2_controller_humble:
+    build:
+      context: ./ros2_controller_humble  
+      dockerfile: Dockerfile
+    container_name: robot_controller_humble
+    depends_on:
+      - ros1_bridge_melodic_humble
+    environment:
+      - ROS_DOMAIN_ID=0
+    networks:
+      - ros_network
+    volumes:
+      - ./ros2_controller_humble/src:/ros2_ws/src/robot_controller:rw
+    stdin_open: true
+    tty: true
+    command: "bash -c 'source /opt/ros/humble/setup.bash && source /ros2_ws/install/setup.bash && python3 /ros2_ws/src/robot_controller/robot_controller/controller_node.py'"
+
+networks:
+  ros_network:
+    driver: bridge
