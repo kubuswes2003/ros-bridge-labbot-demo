@@ -53,7 +53,23 @@ services:
     stdin_open: true
     tty: true
     command: "bash -c 'source /opt/ros/humble/setup.bash && source /ros2_ws/install/setup.bash && sleep 8 && python3 /ros2_ws/src/robot_controller/robot_controller/controller_node.py'"
-
+  web_api_humble:
+    build:
+      context: ./ros2_controller
+      dockerfile: Dockerfile
+    container_name: web_api_humble
+    depends_on:
+      - ros1_bridge
+    networks:
+      - ros_network
+    ports:
+      - "5001:5000"
+    environment:
+      - ROS_DOMAIN_ID=0
+    command: >
+      bash -c "source /opt/ros/foxy/setup.bash &&
+               source /ros2_ws/install/setup.bash &&
+               simple_web_api"
 networks:
   ros_network:
     driver: bridge

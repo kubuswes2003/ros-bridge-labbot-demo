@@ -6,6 +6,9 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install flask flask-cors
+
+
 # Tworzymy workspace ROS2
 RUN mkdir -p /ros2_ws/src/robot_controller
 WORKDIR /ros2_ws
