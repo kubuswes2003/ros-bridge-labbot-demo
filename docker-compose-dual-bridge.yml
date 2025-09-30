@@ -63,7 +63,7 @@ services:
     networks:
       - ros_network
     ports:
-      - "5001:5000"
+      - "5001:5001"
     environment:
       - ROS_DOMAIN_ID=0
     command: >

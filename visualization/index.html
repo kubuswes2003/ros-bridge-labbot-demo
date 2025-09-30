@@ -3,300 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROS1-ROS2 Bridge Demo - Labbot (LIVE DATA)</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #f0f2f5;
-            color: #333;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            grid-gap: 20px;
-            height: calc(100vh - 40px);
-        }
-        .left-panel {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .command-box {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            min-height: 120px;
-        }
-        .command-title {
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 8px;
-        }
-        .command-content {
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.85em;
-            line-height: 1.6;
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        .robot-arena {
-            width: 100%;
-            height: 100%;
-            background: #ecf0f1;
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-            border: 3px solid #34495e;
-            min-height: 500px;
-        }
-        .robot {
-            width: 50px;
-            height: 50px;
-            background: #e74c3c;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.3s ease-out;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-            border: 4px solid #c0392b;
-            z-index: 10;
-        }
-        .robot::before {
-            content: '';
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 12px solid transparent;
-            border-right: 12px solid transparent;
-            border-bottom: 20px solid #c0392b;
-        }
-        .arena-title {
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(52, 73, 94, 0.9);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-        .coordinates {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            background: rgba(52, 73, 94, 0.9);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.9em;
-        }
-        .title {
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 2.2em;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #27ae60;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
-        }
-        .status-indicator.disconnected {
-            background: #e74c3c;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .bridge-flow {
-            font-size: 0.9em;
-            margin-top: 10px;
-            padding: 8px;
-            background: linear-gradient(90deg, #3498db, #9b59b6);
-            color: white;
-            border-radius: 6px;
-            text-align: center;
-        }
-        .sync-indicator {
-            background: #27ae60;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-            display: inline-block;
-            margin-left: 10px;
-        }
-        .trail {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(231, 76, 60, 0.3);
-            border-radius: 50%;
-            pointer-events: none;
-            transition: opacity 3s ease-out;
-        }
-    </style>
+    <title>🤖 Labbot Control Panel</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="title">
-        ROS1-ROS2 Bridge Demo - Labbot Robot 
-        <span class="sync-indicator" id="syncStatus">LIVE DATA</span>
-    </div>
-    
     <div class="container">
-        <div class="left-panel">
-            <div class="robot-arena">
-                <div class="arena-title">Robot - PRAWDZIWE dane z ROS</div>
-                <div class="robot" id="robot"></div>
-                <div class="coordinates" id="coordinates">
-                    X: 0.00m, Y: 0.00m, θ: 0.00°<br>
-                    <span style="color: #27ae60;">Łączenie z API...</span>
-                </div>
+        <!-- LEFT SIDE: Canvas Visualization -->
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <h2>🗺️ Robot Position & Trajectory</h2>
+                <button id="clearTrail" class="btn-clear">🗑️ Wyczyść ślad</button>
+            </div>
+            <canvas id="robotCanvas"></canvas>
+            <div class="canvas-info">
+                <span id="canvasZoom">Zoom: 1.0x</span>
+                <span id="canvasCoords">Grid: 10m x 10m</span>
             </div>
         </div>
-        
-        <div class="right-panel">
-            <div class="command-box">
-                <div class="command-title">
-                    <span class="status-indicator" id="statusDot"></span>
-                    Status połączenia
+
+        <!-- RIGHT SIDE: Info Panels -->
+        <div class="panels-section">
+            <!-- Panel 1: ROS2 Command (Pink) -->
+            <div class="panel panel-pink">
+                <div class="panel-header">
+                    <span class="panel-icon">📡</span>
+                    <h3>ROS2 Command</h3>
                 </div>
-                <div class="command-content" id="ros2Status">
-                    Łączenie z ROS API...<br>
+                <div class="panel-content" id="ros2Command">
+                    <div class="data-row">
+                        <span class="label">Linear X:</span>
+                        <span class="value" id="cmd_linear">0.0 m/s</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Angular Z:</span>
+                        <span class="value" id="cmd_angular">0.0 rad/s</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Command:</span>
+                        <span class="value cmd-type" id="cmd_type">⏸️ STOP</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="command-box">
-                <div class="command-title">
-                    <span class="status-indicator"></span>
-                    Dane z robota (Odometria)
+
+            <!-- Panel 2: Control Panel (Future Input) -->
+            <div class="panel panel-gray">
+                <div class="panel-header">
+                    <span class="panel-icon">🎮</span>
+                    <h3>Control Panel</h3>
                 </div>
-                <div class="command-content" id="ros1Feedback">
-                    Czekam na dane z /odom...<br>
+                <div class="panel-content panel-placeholder">
+                    <p class="placeholder-text">Wpisanie komendy ros2 do poruszania</p>
+                    <p class="placeholder-subtext">(na przyszłość - teraz tylko terminal)</p>
                 </div>
-                <div class="bridge-flow">
-                    ROS2 → Bridge → API → Browser
+            </div>
+
+            <!-- Panel 3: Bridge Translation (Pink) -->
+            <div class="panel panel-pink">
+                <div class="panel-header">
+                    <span class="panel-icon">🔄</span>
+                    <h3>Bridge Translation</h3>
+                </div>
+                <div class="panel-content" id="bridgeTranslation">
+                    <div class="data-row">
+                        <span class="label">Status:</span>
+                        <span class="value" id="bridge_status">✅ Active</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">ROS1 Topic:</span>
+                        <span class="value mono">/cmd_vel</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Translation:</span>
+                        <span class="value" id="bridge_info">Humble → Melodic</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 4: Robot State -->
+            <div class="panel panel-gray">
+                <div class="panel-header">
+                    <span class="panel-icon">🤖</span>
+                    <h3>Robot State</h3>
+                </div>
+                <div class="panel-content" id="robotState">
+                    <div class="data-row">
+                        <span class="label">Position X:</span>
+                        <span class="value" id="pos_x">0.00 m</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Position Y:</span>
+                        <span class="value" id="pos_y">0.00 m</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Orientation:</span>
+                        <span class="value" id="pos_theta">0.0°</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Executing:</span>
+                        <span class="value cmd-type" id="robot_executing">⏸️ IDLE</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        class LiveROSDashboard {
-            constructor() {
-                this.robotX = 50;
-                this.robotY = 50;
-                this.robotTheta = 0;
-                this.lastUpdate = 0;
-                
-                this.init();
-            }
-            
-            init() {
-                this.fetchRealData();
-                setInterval(() => this.fetchRealData(), 100); // 10 Hz
-            }
-            
-            async fetchRealData() {
-                try {
-                    const response = await fetch('http://localhost:5000/api/robot_state');
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        this.updateVisualization(data);
-                        this.lastUpdate = Date.now();
-                        
-                        // Status OK
-                        document.getElementById('statusDot').classList.remove('disconnected');
-                        document.getElementById('syncStatus').textContent = 'LIVE DATA';
-                        document.getElementById('syncStatus').style.background = '#27ae60';
-                    }
-                } catch (error) {
-                    console.error('Błąd połączenia:', error);
-                    document.getElementById('statusDot').classList.add('disconnected');
-                    document.getElementById('syncStatus').textContent = 'DISCONNECTED';
-                    document.getElementById('syncStatus').style.background = '#e74c3c';
-                }
-            }
-            
-            updateVisualization(data) {
-                // Konwertuj metry na procenty dla CSS
-                const pixelX = 50 + (data.x * 200); // 50% środek + offset
-                const pixelY = 50 - (data.y * 200); // odwrócone Y
-                
-                this.robotX = pixelX;
-                this.robotY = pixelY;
-                this.robotTheta = -data.theta_deg; // odwrócone dla CSS
-                
-                // Animuj robota
-                const robot = document.getElementById('robot');
-                robot.style.left = this.robotX + '%';
-                robot.style.top = this.robotY + '%';
-                robot.style.transform = `translate(-50%, -50%) rotate(${this.robotTheta}deg)`;
-                
-                // Aktualizuj współrzędne
-                document.getElementById('coordinates').innerHTML = `
-                    X: ${data.x.toFixed(3)}m, Y: ${data.y.toFixed(3)}m, θ: ${data.theta.toFixed(2)}rad<br>
-                    <span style="color: #27ae60;">LIVE DATA z ROS (${data.theta_deg.toFixed(1)}°)</span>
-                `;
-                
-                // Aktualizuj status
-                document.getElementById('ros2Status').innerHTML = `
-                    Połączenie: OK<br>
-                    API: http://localhost:5000<br>
-                    Update rate: 10 Hz<br>
-                    Pozycja: (${data.x.toFixed(2)}, ${data.y.toFixed(2)}) m<br>
-                    Orientacja: ${data.theta_deg.toFixed(1)}°
-                `;
-                
-                document.getElementById('ros1Feedback').innerHTML = `
-                    Topic: /odom (nav_msgs/Odometry)<br>
-                    Przez: ros1_bridge → ROS2 → Flask API<br>
-                    Timestamp: ${new Date().toLocaleTimeString()}<br>
-                    Status: ✅ Otrzymano dane
-                `;
-            }
-        }
-        
-        // Uruchom po załadowaniu
-        document.addEventListener('DOMContentLoaded', () => {
-            new LiveROSDashboard();
-        });
-    </script>
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-item">
+            <span class="status-dot" id="apiStatus"></span>
+            <span id="statusText">Connecting...</span>
+        </div>
+        <div class="status-item">
+            <span>Last Update: <span id="lastUpdate">-</span></span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

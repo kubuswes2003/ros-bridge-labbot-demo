@@ -2,7 +2,6 @@
 """
 ROS2 Robot Controller - wysyła komendy ruchu do robota przez ros1_bridge
 """
-
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
@@ -23,8 +22,8 @@ class RobotController(Node):
             Odometry, '/odom', self.odom_callback, 10
         )
         
-        # Timer do wysyłania komend co 2 sekundy
-        self.cmd_timer = self.create_timer(2.0, self.send_movement_command)
+        # Timer do wysyłania komend co 4 sekundy (czas na jeden bok/obrót)
+        self.cmd_timer = self.create_timer(4.0, self.send_movement_command)
         
         # Stan controllera
         self.command_counter = 0
@@ -34,7 +33,7 @@ class RobotController(Node):
         self.get_logger().info('✅ Controller gotowy!')
         self.get_logger().info('📡 Publikuje komendy na /cmd_vel')
         self.get_logger().info('📡 Subskrybuje odometrię z /odom')
-
+    
     def odom_callback(self, msg):
         """Callback - otrzymujemy odometrię z robota (przez bridge)"""
         self.robot_x = msg.pose.pose.position.x
@@ -44,39 +43,34 @@ class RobotController(Node):
         self.get_logger().info(
             f'📍 Pozycja robota: x={self.robot_x:.2f}, y={self.robot_y:.2f}'
         )
-
+    
     def send_movement_command(self):
-        """Wysyła cykliczne komendy ruchu - DEMO"""
+        """Wysyła cykliczne komendy ruchu - kwadrat 2x2m"""
         cmd = Twist()
         
-        # Różne wzory ruchu dla demonstracji
-        if self.command_counter % 4 == 0:
-            # Jedź do przodu
+        # Kwadrat 2x2m: timer co 4s
+        # Boki: 2m przy 0.5m/s = 4 sekundy
+        # Obroty: 90° (π/2 rad) przy 0.4 rad/s ≈ 4 sekundy
+        
+        cycle = self.command_counter % 8
+        
+        if cycle in [0, 2, 4, 6]:
+            # Jedź prosto 2m (4s przy 0.5m/s)
             cmd.linear.x = 0.5
             cmd.angular.z = 0.0
-            movement = "⬆️ PRZÓD"
-        elif self.command_counter % 4 == 1:
-            # Skręć w prawo
-            cmd.linear.x = 0.0
-            cmd.angular.z = -0.5
-            movement = "➡️ PRAWO"
-        elif self.command_counter % 4 == 2:
-            # Jedź do tyłu
-            cmd.linear.x = -0.3
-            cmd.angular.z = 0.0
-            movement = "⬇️ TYŁ"
+            movement = f"⬆️ BÓK {cycle//2 + 1}"
         else:
-            # Skręć w lewo
+            # Obrót 90° w prawo
             cmd.linear.x = 0.0
-            cmd.angular.z = 0.5
-            movement = "⬅️ LEWO"
+            cmd.angular.z = -0.4
+            movement = f"🔄 OBRÓT {(cycle+1)//2}"
         
         # Publikuj komendę
         self.cmd_pub.publish(cmd)
         
         # Log demonstracyjny
         self.get_logger().info(
-            f'🎮 Wysłano komendę #{self.command_counter}: {movement} '
+            f'🎮 Komenda #{self.command_counter}: {movement} '
             f'(lin={cmd.linear.x:.1f}, ang={cmd.angular.z:.1f})'
         )
         
@@ -84,7 +78,6 @@ class RobotController(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    
     try:
         controller = RobotController()
         controller.get_logger().info('🔄 Controller działa... Wysyłam komendy do robota!')
