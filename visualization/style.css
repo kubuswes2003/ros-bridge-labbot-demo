@@ -1,0 +1,244 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    height: calc(100vh - 40px);
+    gap: 20px;
+    padding: 20px;
+}
+
+/* LEFT SIDE: Canvas */
+.canvas-section {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.canvas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.canvas-header h2 {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.btn-clear {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+#robotCanvas {
+    flex: 1;
+    background: #0f0f0f;
+    border: 2px solid #333;
+    border-radius: 8px;
+    cursor: crosshair;
+}
+
+.canvas-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #888;
+}
+
+/* RIGHT SIDE: Panels */
+.panels-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+}
+
+.panel {
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s;
+}
+
+.panel:hover {
+    transform: translateY(-2px);
+}
+
+.panel-pink {
+    border-left: 4px solid #ff6b9d;
+    background: linear-gradient(135deg, #1a1a1a 0%, #251520 100%);
+}
+
+.panel-gray {
+    border-left: 4px solid #4a5568;
+    background: linear-gradient(135deg, #1a1a1a 0%, #1f2228 100%);
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.panel-icon {
+    font-size: 20px;
+}
+
+.panel-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.label {
+    color: #999;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.value {
+    color: #e0e0e0;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.cmd-type {
+    padding: 4px 10px;
+    background: #2a2a2a;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.mono {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+.panel-placeholder {
+    text-align: center;
+    padding: 20px 10px;
+}
+
+.placeholder-text {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.placeholder-subtext {
+    color: #555;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Status Bar */
+.status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #1a1a1a;
+    border-top: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 13px;
+    color: #888;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #666;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.connected {
+    background: #28a745;
+}
+
+.status-dot.error {
+    background: #dc3545;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Scrollbar */
+.panels-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.panels-section::-webkit-scrollbar-track {
+    background: #0a0a0a;
+    border-radius: 4px;
+}
+
+.panels-section::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+.panels-section::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

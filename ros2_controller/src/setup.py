@@ -3,7 +3,7 @@ from setuptools import setup
 package_n = 'robot_controller'
 
 setup(
-    n=package_n,
+    name=package_n,
     version='1.0.0',
     packages=[package_n],
     data_files=[
@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'controller_node = robot_controller.controller_node:main',
+            'simple_web_api = robot_controller.simple_web_api:main',
         ],
     },
 )
